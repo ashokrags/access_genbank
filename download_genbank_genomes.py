@@ -119,9 +119,12 @@ class GenbankAccessor:
     def download_genomes(self):
         #sp.check_output(com, shell=True)
         if self.out_dir is not None:
-            down_dir = self.out_dir
+            down_dir = os.path.join(self.out_dir, "genbank_downloads")
         else:
-            down_dir = os.getcwd()
+            down_dir = os.path.join(os.getcwd(),"genbank_downloads")
+
+        if not os.path.exists(down_dir):
+            os.mkdir(down_dir)
 
         concat_file = self.base_ftp_path.split("/")[-1] + "_concat.fa"
 
