@@ -1,6 +1,6 @@
 import ftputil
 import logging
-import os, sys
+import os, sys, argparse as args
 import subprocess as sp
 
 logging.basicConfig(filename='download_app.log', filemode='w', format='%(levelname)s - %(message)s',
@@ -141,5 +141,40 @@ class GenbankAccessor:
             sp.check_output( "gzip " + os.path.join(down_dir,concat_file) , shell=True)
         return
 
+def get_args():
+    '''
+    Use Argparse to parse command line arguments
+
+
+    :return: Argument Parser
+    '''
+
+    #base_ftp_path = '/genomes/refseq/bacteria',
+    #assembly_dir = 'latest_assembly_versions',
+    #file_type_to_search = 'genomic.fna',
+    #species_to_exclude = ["Abiotrophia_sp._HMSC24B09"],
+    #concatenate = False,
+    #output_dir = None,
+    #dry_run = False
+
+    parser = args.ArgumentParser()
+    parser.add_argument('-b', '--base_ftp_path', default = '/genomes/refseq/bacteria', help = "provide the base path for the directories to be queried")
+    parser.add_argument('-ad', '--assembly_dir', default = 'latest_assembly_versions', help = "provide the base path for the directories to be queried")
+    parser.add_argument('-ft', '--file_type_to_search', default =  'genomic.fna',  help = "provide the base path for the directories to be queried")
+    parser.add_argument('-se', '--species_to_exclude', default = [], help = "provide the base path for the directories to be queried")
+    parser.add_argument('-c', '--concatenate', default= False,  help = "provide the base path for the directories to be queried")
+    parser.add_argument('-o', '--output_dir', default = None, help = "provide the base path for the directories to be queried")
+    parser.add_argument('-dr', '--dry_run', default = False, help = "provide the base path for the directories to be queried")
+    myargs = parser.parse_args()
+    return myargs
+
 if __name__== "__main__" :
-    GenbankAccessor( concatenate=True)
+    my_args = get_args()
+    print my_args
+    GenbankAccessor( base_ftp_path=my_args.base_ftp_path,
+                     assembly_dir=my_args.assembly_dir,
+                     file_type_to_search=my_args.file_type_to_search,
+                     species_to_exclude=my_args.species_to_exclude,
+                     concatenate=my_args.concatenate,
+                     output_dir=my_args.output_dir,
+                     dry_run=my_args.dry_run)
