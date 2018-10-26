@@ -72,9 +72,10 @@ class GenbankAccessor:
         return
 
     def create_download_genomes_list(self):
+        print "**** Getting the list of species to download\n"
 
-        for species in tqdm.tqdm(self.species_retrieved[:10]):
-            print species
+        for species in tqdm.tqdm(self.species_retrieved):
+            #print species
             ##if species in species_to_exclude:
             ##    print "found species to exclude"
 
@@ -112,7 +113,7 @@ class GenbankAccessor:
                     download_file_path = os.path.join(tmp_final_path, file_to_retr )
                 else:
                     download_file_idx = [i for i, s in enumerate(self.host.listdir(".")) if self.file_type_to_search in s][0]
-                    print self.host.listdir(".")[download_file_idx[0]]
+                    #print self.host.listdir(".")[download_file_idx[0]]
                     file_to_retr = self.host.listdir(".")[download_file_idx[0]]
                     download_file_path = os.path.join(tmp_final_path, file_to_retr )
                 com = "wget ftp://"
