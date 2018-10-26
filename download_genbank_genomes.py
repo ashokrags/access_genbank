@@ -3,8 +3,6 @@ import logging
 import os, sys, argparse as args
 import subprocess as sp
 
-logging.basicConfig(filename='download_app.log', filemode='w', format='%(levelname)s - %(message)s',
-                    level=logging.DEBUG)
 
 # https://warwick.ac.uk/fac/sci/moac/people/students/peter_cock/python/ftp/
 
@@ -27,7 +25,15 @@ class GenbankAccessor:
                  species_to_exclude=["Abiotrophia_sp._HMSC24B09"],
                  concatenate=False,
                  output_dir = None,
+                 log_dir = None,
                  dry_run = False):
+
+        logfile = "genbank_download_app.log"
+        if log_dir is not None:
+            logfile = os.path.join(output_dir,"genbank_download_app.log")
+        logging.basicConfig(filename=logfile, filemode='w', format='%(levelname)s - %(message)s',
+                            level=logging.DEBUG)
+
         self.base_ftp_path = base_ftp_path
         self.assembly_dir = assembly_dir
         self.species_to_exclude = species_to_exclude
@@ -167,6 +173,7 @@ def get_args():
     parser.add_argument('-se', '--species_to_exclude', default = [], help = "provide the base path for the directories to be queried")
     parser.add_argument('-c', '--concatenate', default= False,  help = "provide the base path for the directories to be queried")
     parser.add_argument('-o', '--output_dir', default = None, help = "provide the base path for the directories to be queried")
+    parser.add_argument('-ol', '--log_dir', default = None, help = "provide the base path for the directories to be queried")
     parser.add_argument('-dr', '--dry_run', default = False, help = "provide the base path for the directories to be queried")
     myargs = parser.parse_args()
     return myargs
@@ -180,4 +187,5 @@ if __name__== "__main__" :
                      species_to_exclude=my_args.species_to_exclude,
                      concatenate=my_args.concatenate,
                      output_dir=my_args.output_dir,
+                     log_dir=my_args.log_dir,
                      dry_run=my_args.dry_run)
