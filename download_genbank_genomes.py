@@ -1,6 +1,6 @@
 import ftputil
 import logging
-import os, sys, argparse as args
+import os, sys, argparse as args, tqdm
 import subprocess as sp
 
 
@@ -72,14 +72,15 @@ class GenbankAccessor:
         return
 
     def create_download_genomes_list(self):
-        for species in self.species_retrieved:
+
+        for species in tqdm.tqdm(self.species_retrieved[:10]):
             print species
             ##if species in species_to_exclude:
             ##    print "found species to exclude"
 
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
             self.host.chdir(species_rtrv_path)
-            print self.host.listdir(".")
+            # print self.host.listdir(".")
 
             if self.assembly_dir in self.host.listdir("."):
 
