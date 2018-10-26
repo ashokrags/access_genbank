@@ -30,7 +30,7 @@ class GenbankAccessor:
 
         logfile = "genbank_download_app.log"
         if log_dir is not None:
-            logfile = os.path.join(output_dir,"genbank_download_app.log")
+            logfile = os.path.join(log_dir,"genbank_download_app.log")
         logging.basicConfig(filename=logfile, filemode='w', format='%(levelname)s - %(message)s',
                             level=logging.DEBUG)
 
