@@ -72,7 +72,7 @@ class GenbankAccessor:
         return
 
     def create_download_genomes_list(self):
-        for species in self.species_retrieved[:5]:
+        for species in self.species_retrieved:
             print species
             ##if species in species_to_exclude:
             ##    print "found species to exclude"
