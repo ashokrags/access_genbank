@@ -41,7 +41,7 @@ class GenbankAccessor:
         self.out_dir = output_dir
         self.file_type_to_search = file_type_to_search
         self.concatenate = concatenate
-        self.connect()
+        self.init_connect()
         self.create_species_download_list()
         self.create_download_genomes_list()
         if not dry_run:
@@ -51,7 +51,7 @@ class GenbankAccessor:
 
 
 
-    def connect(self):
+    def init_connect(self):
         self.host = ftputil.FTPHost('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
         self.host.chdir(self.base_ftp_path)
         logging.info("Number of Genomes to Fetch: " + str(len(self.host.listdir("."))))
@@ -80,6 +80,8 @@ class GenbankAccessor:
             ##    print "found species to exclude"
 
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
+
+            self.host = ftputil.FTPHost('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
             self.host.chdir(species_rtrv_path)
             # print self.host.listdir(".")
 
