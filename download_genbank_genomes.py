@@ -81,7 +81,6 @@ class GenbankAccessor:
 
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
 
-            self.host = ftputil.FTPHost('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
             try:
                 self.host.chdir(species_rtrv_path)
             except:
