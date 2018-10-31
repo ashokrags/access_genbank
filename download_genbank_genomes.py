@@ -87,6 +87,7 @@ class GenbankAccessor:
             except:
                 self.host = ftputil.FTPHost('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
                 self.host.chdir(species_rtrv_path)
+                logging.warnings(species + ": Connection timeout\n")
             # print self.host.listdir(".")
 
             if self.assembly_dir in self.host.listdir("."):
