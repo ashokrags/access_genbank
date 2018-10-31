@@ -82,7 +82,11 @@ class GenbankAccessor:
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
 
             self.host = ftputil.FTPHost('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
-            self.host.chdir(species_rtrv_path)
+            try:
+                self.host.chdir(species_rtrv_path)
+            except:
+                self.host = ftputil.FTPHost('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
+                self.host.chdir(species_rtrv_path)
             # print self.host.listdir(".")
 
             if self.assembly_dir in self.host.listdir("."):
