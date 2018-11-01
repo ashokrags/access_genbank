@@ -89,7 +89,7 @@ class GenbankAccessor:
                 self.host.chdir(species_rtrv_path)
                 logging.warnings(species + ": Connection timeout\n")
 
-            print self.host.listdir(".")
+            print self.host.listdir("."), self.assembly_dir
 
             if self.assembly_dir in self.host.listdir("."):
 
