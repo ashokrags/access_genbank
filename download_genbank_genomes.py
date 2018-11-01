@@ -84,10 +84,12 @@ class GenbankAccessor:
             try:
                 self.host.chdir(species_rtrv_path)
             except:
+
                 self.host = ftputil.FTPHost('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
                 self.host.chdir(species_rtrv_path)
                 logging.warnings(species + ": Connection timeout\n")
-            # print self.host.listdir(".")
+
+            self.host.listdir(".")
 
             if self.assembly_dir in self.host.listdir("."):
 
@@ -122,6 +124,7 @@ class GenbankAccessor:
                     #print self.host.listdir(".")[download_file_idx[0]]
                     file_to_retr = self.host.listdir(".")[download_file_idx[0]]
                     download_file_path = os.path.join(tmp_final_path, file_to_retr )
+
                 com = "wget ftp://"
                 com +=  download_file_path + " "
                 self.download_info[species] = {'Available': True, 'download_path': download_file_path, 'file_to_retr': file_to_retr, 'wget_command': com}
