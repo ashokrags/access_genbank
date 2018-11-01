@@ -92,7 +92,7 @@ class GenbankAccessor:
             print self.host.listdir(".")
 
             if self.assembly_dir in self.host.listdir("."):
-                print self.assembly_dir
+                print species, self.assembly_dir
                 tmp_final_path = os.path.join(species_rtrv_path, self.assembly_dir)
                 # print tmp_final_path
                 self.host.chdir(tmp_final_path)
@@ -106,6 +106,7 @@ class GenbankAccessor:
                 else:
 
                     tmp_final_path += "/" + self.host.listdir(".")[0]
+                    logging.info(species + ": Single Assembly: " + self.host.listdir(".")[0] )
 
                 # change into the assembly directory
                 # To fix timeout errors just kit the files in the directory every time
