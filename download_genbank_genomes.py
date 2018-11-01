@@ -74,7 +74,7 @@ class GenbankAccessor:
     def create_download_genomes_list(self):
         print "**** Getting the list of species to download\n"
 
-        for species in tqdm.tqdm(self.species_retrieved):
+        for species in tqdm.tqdm(self.species_retrieved[:50]):
             #print species
             ##if species in species_to_exclude:
             ##    print "found species to exclude"
@@ -89,7 +89,7 @@ class GenbankAccessor:
                 self.host.chdir(species_rtrv_path)
                 logging.warnings(species + ": Connection timeout\n")
 
-            self.host.listdir(".")
+            print self.host.listdir(".")
 
             if self.assembly_dir in self.host.listdir("."):
 
@@ -108,6 +108,10 @@ class GenbankAccessor:
                     tmp_final_path += "/" + self.host.listdir(".")[0]
 
                 # change into the assembly directory
+                # To fix timeout errors just kit the files in the directory every time
+                # this prevents timeouts with data connections
+                # https://ftputil.sschwarzer.net/trac/ticket/79
+
                 self.host.chdir(tmp_final_path)
 
                 download_file_path = ''
