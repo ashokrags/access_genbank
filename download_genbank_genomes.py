@@ -1,4 +1,4 @@
-import ftputil
+import ftplib
 import logging
 import os, sys, argparse as args, tqdm
 import subprocess as sp
@@ -43,6 +43,7 @@ class GenbankAccessor:
         self.concatenate = concatenate
         self.init_connect()
         self.create_species_download_list()
+        self.host.close()
         self.create_download_genomes_list()
         if not dry_run:
             self.download_genomes()
@@ -52,9 +53,13 @@ class GenbankAccessor:
 
 
     def init_connect(self):
-        self.host = ftputil.FTPHost('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
-        self.host.chdir(self.base_ftp_path)
-        logging.info("Number of Genomes to Fetch: " + str(len(self.host.listdir("."))))
+        self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
+        self.host.cwd(self.base_ftp_path)
+        ## TO REMOVE
+        #dir_list = self.get_dir_contents(self.host)
+
+        dir_list = self.host.nlst()
+        logging.info("Number of Genomes to Fetch: " + str(len(dir_list)))
         return
 
     def create_species_download_list(self):
@@ -62,7 +67,8 @@ class GenbankAccessor:
             print "Error. You can only specify one or the other\n"
             sys.exit(0)
         else:
-            dir_list = self.host.listdir(".")
+
+            dir_list = self.host.nlst()
             if len(self.species_to_exclude) > 0:
                 self.species_retrieved = [x for x in dir_list if x not in self.species_to_exclude]
             elif len(self.target_species_list) > 0:
@@ -71,75 +77,84 @@ class GenbankAccessor:
                 self.species_retrieved = [x for x in dir_list]
         return
 
-    def create_download_genomes_list(self):
-        print "**** Getting the list of species to download\n"
 
-        for species in tqdm.tqdm(self.species_retrieved[:50]):
+    def create_download_genomes_list(self):
+        print "\n\n**** Getting the list of species to download\n"
+
+        for species in tqdm.tqdm(self.species_retrieved):
             #print species
             ##if species in species_to_exclude:
             ##    print "found species to exclude"
 
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
+            self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
+            self.host.cwd(species_rtrv_path)
+            #    logging.warnings(species + ": Connection timeout\n")
 
-            try:
-                self.host.chdir(species_rtrv_path)
-            except:
+            dir_list = self.host.nlst()
 
-                self.host = ftputil.FTPHost('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
-                self.host.chdir(species_rtrv_path)
-                logging.warnings(species + ": Connection timeout\n")
 
-            print self.host.listdir(".")
-
-            if self.assembly_dir in self.host.listdir("."):
-                print species, self.assembly_dir
+            if self.assembly_dir in dir_list:
+                #print species, self.assembly_dir
                 tmp_final_path = os.path.join(species_rtrv_path, self.assembly_dir)
-                # print tmp_final_path
-                self.host.chdir(tmp_final_path)
+                self.host.cwd(tmp_final_path)
 
-                if len(self.host.listdir(".")) > 1:
+                dir_list = self.host.nlst()
+
+                if len(dir_list) > 1:
                     info_txt = species + ": There are multiple assemblies\n\tAssemblies: "
-                    info_txt += ', '.join(self.host.listdir("."))
-                    info_txt += "\n\tUsing the Latest Assembly: " + self.host.listdir(".")[-1]
+                    info_txt += ', '.join(dir_list)
+                    info_txt += "\n\tUsing the Latest Assembly: " + dir_list[-1]
                     logging.warning(info_txt)
-                    tmp_final_path += "/" + self.host.listdir(".")[-1]
+                    tmp_final_path = os.path.join(tmp_final_path,dir_list[-1])
                 else:
 
-                    tmp_final_path += "/" + self.host.listdir(".")[0]
-                    logging.info(species + ": Single Assembly: " + self.host.listdir(".")[0] )
+                    tmp_final_path  = os.path.join(tmp_final_path, dir_list[0])
+                    logging.info(species + ": Single Assembly: " + dir_list[0] )
 
                 # change into the assembly directory
                 # To fix timeout errors just kit the files in the directory every time
                 # this prevents timeouts with data connections
                 # https://ftputil.sschwarzer.net/trac/ticket/79
 
-                self.host.chdir(tmp_final_path)
+                self.host.cwd(tmp_final_path)
 
-                download_file_path = ''
+
+                retr_file_list = self.host.nlst()
+
+                #print " The Observed working directory is: ", tmp_final_path
+                #print " The Actual working directory is: ", self.host.pwd()
+
+                full_file_path = ''
 
                 if self.file_type_to_search == "genomic.fna":
-                    download_files_idx_list = [i for i, s in enumerate(self.host.listdir(".")) if
+                    download_files_idx_list = [i for i, s in enumerate(retr_file_list) if
                                                self.file_type_to_search in s]
-                    tmp_list_files = [self.host.listdir(".")[x] for x in download_files_idx_list]
+                    tmp_list_files = [retr_file_list[x] for x in download_files_idx_list]
                     download_file_idx = [i for i, s in enumerate(tmp_list_files) if 'from_genomic' not in s]
                     file_to_retr = tmp_list_files[download_file_idx[0]]
-                    download_file_path = os.path.join(tmp_final_path, file_to_retr )
+                    full_file_path = os.path.join(tmp_final_path, file_to_retr )
                 else:
-                    download_file_idx = [i for i, s in enumerate(self.host.listdir(".")) if self.file_type_to_search in s][0]
+                    download_file_idx = [i for i, s in enumerate(retr_file_list) if self.file_type_to_search in s][0]
                     #print self.host.listdir(".")[download_file_idx[0]]
-                    file_to_retr = self.host.listdir(".")[download_file_idx[0]]
-                    download_file_path = os.path.join(tmp_final_path, file_to_retr )
+                    file_to_retr = retr_file_list[download_file_idx[0]]
+                    full_file_path = os.path.join(tmp_final_path, file_to_retr )
 
                 com = "wget ftp://"
-                com +=  download_file_path + " "
-                self.download_info[species] = {'Available': True, 'download_path': download_file_path, 'file_to_retr': file_to_retr, 'wget_command': com}
+                com +=  os.path.join(tmp_final_path, file_to_retr)
+                self.download_info[species] = {'Available': True, 'download_path': tmp_final_path,
+                                               'file_to_retr': file_to_retr, 'full_download_path':full_file_path,
+                                               'alt_download_path':self.host.pwd() ,'wget_command': com}
             else:
                 logging.warning(species + ": Assembly not found .. Skipping")
                 self.download_info[species] = {'Available': False}
+            self.host.close()
         return
 
     def download_genomes(self):
-        #sp.check_output(com, shell=True)
+        print "\n\n **** Download Started \n"
+        logging.info("************\nDownload Logs\n************\n")
+
         if self.out_dir is not None:
             down_dir = os.path.join(self.out_dir, "genbank_downloads")
         else:
@@ -150,19 +165,60 @@ class GenbankAccessor:
 
         concat_file = self.base_ftp_path.split("/")[-1] + "_concat.fa"
 
-        for spp,v in self.download_info.iteritems():
+        self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
+
+        for spp,v in tqdm.tqdm(self.download_info.items()):
             if not v['Available']:
                 continue
             else:
                 file_to_retr = v['file_to_retr']
-                if self.host.path.isfile(v['download_path']):
-                    self.host.download(v['download_path'], os.path.join(down_dir,file_to_retr))
+                try:
+                    self.host.cwd(v['download_path'])
+                except:
+                    self.host.close()
+                    self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
+                    self.host.cwd(v['download_path'])
+
+                file_exists = True
+                def null_call():
+                    pass
+
+                try:
+                    self.host.dir(v['full_download_path'].replace('fna', 'fnap'), null_call())
+                except:
+                    file_exists = False
+
+                file_copy = os.path.join(down_dir,file_to_retr)
+
+                if file_exists:
+                    self.host.dir(v['full_download_path'])
+                    file_orig = os.path.join(v['download_path'], file_to_retr)
+                    try:
+                        with open(file_copy, 'w') as fp:
+                            res = self.host.retrbinary('RETR ' + file_orig, fp.write)
+                            if not res.startswith('226 Transfer complete'):
+                                print('Download failed')
+                                logging.warning(spp + ": DDWNLOAD FAILED " + v['full_download_path'] + "\n")
+                                if os.path.isfile(file_copy):
+                                    os.remove(file_copy)
+                            else:
+                                logging.info(spp + ": DDWNLOAD COMPLETE " + v['full_download_path'] + "\n")
+
+                    except self.host.all_errors as e:
+                        print('FTP error:', e)
+                        logging.warning(spp + ": DDWNLOAD ERROR " + v['full_download_path'] + "\n")
+
                     if self.concatenate:
                         com = "gunzip -c " + os.path.join(down_dir,file_to_retr) + " | sed 's/>/>" + spp + "_/' >> "
                         com += os.path.join(down_dir, concat_file )
                         sp.check_output(com, shell=True)
+                else:
+                    logging.warning(spp + ": FILE DOES NOT EXIST " + v['full_download_path'] + "\n" )
 
         if self.concatenate and os.path.exists(os.path.join(down_dir, concat_file)):
+            concat_gzip_file = os.path.join(down_dir,concat_file)+".gz"
+            if os.path.isfile(concat_gzip_file):
+                os.remove(concat_gzip_file)
             sp.check_output( "gzip " + os.path.join(down_dir,concat_file) , shell=True)
         return
 
@@ -201,7 +257,8 @@ if __name__== "__main__" :
                      assembly_dir=my_args.assembly_dir,
                      file_type_to_search=my_args.file_type_to_search,
                      species_to_exclude=my_args.species_to_exclude,
-                     concatenate=my_args.concatenate,
+                     concatenate=True,
+                     #concatenate=my_args.concatenate,
                      output_dir=my_args.output_dir,
                      log_dir=my_args.log_dir,
                      dry_run=my_args.dry_run)
