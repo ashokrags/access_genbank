@@ -87,7 +87,7 @@ class GenbankAccessor:
             ##if species in species_to_exclude:
             ##    print "found species to exclude"
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
-            logging.INFO(species + ":" + species_rtrv_path)
+            logging.info(species + ":" + species_rtrv_path)
             self.host.cwd(species_rtrv_path)
             #    logging.warnings(species + ": Connection timeout\n")
 
