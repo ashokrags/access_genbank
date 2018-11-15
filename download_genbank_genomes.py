@@ -63,6 +63,7 @@ class GenbankAccessor:
         return
 
     def create_species_download_list(self):
+
         if len(self.target_species_list) > 0 and len(self.species_to_exclude) > 0:
             print "Error. You can only specify one or the other\n"
             sys.exit(0)
@@ -85,9 +86,8 @@ class GenbankAccessor:
             #print species
             ##if species in species_to_exclude:
             ##    print "found species to exclude"
-
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
-            self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
+            logging.INFO(species + ":" + species_rtrv_path)
             self.host.cwd(species_rtrv_path)
             #    logging.warnings(species + ": Connection timeout\n")
 
