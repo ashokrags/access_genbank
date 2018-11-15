@@ -90,12 +90,11 @@ class GenbankAccessor:
             logging.info(species + ":" + species_rtrv_path)
             #    logging.warnings(species + ": Connection timeout\n")
             try:
-                dir_list = self.host.nlst()
+                self.host.cwd(species_rtrv_path)
             except:
                 self.host.close()
                 self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
-                self.host.cwd(species_rtrv_path)
-                dir_list = self.host.nlst()
+            dir_list = self.host.nlst()
 
             if self.assembly_dir in dir_list:
                 #print species, self.assembly_dir
