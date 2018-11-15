@@ -88,12 +88,14 @@ class GenbankAccessor:
             ##    print "found species to exclude"
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
             logging.info(species + ":" + species_rtrv_path)
-            self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
-            self.host.cwd(species_rtrv_path)
             #    logging.warnings(species + ": Connection timeout\n")
-
-            dir_list = self.host.nlst()
-
+            try:
+                dir_list = self.host.nlst()
+            except:
+                self.host.close()
+                self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
+                self.host.cwd(species_rtrv_path)
+                dir_list = self.host.nlst()
 
             if self.assembly_dir in dir_list:
                 #print species, self.assembly_dir
@@ -149,7 +151,6 @@ class GenbankAccessor:
             else:
                 logging.warning(species + ": Assembly not found .. Skipping")
                 self.download_info[species] = {'Available': False}
-            self.host.close()
         return
 
     def download_genomes(self):
