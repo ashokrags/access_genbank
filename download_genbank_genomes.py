@@ -205,7 +205,7 @@ class GenbankAccessor:
                             else:
                                 logging.info(spp + ": DDWNLOAD COMPLETE " + v['full_download_path'] + "\n")
 
-                    except self.host.all_errors as e:
+                    except ftplib.all_errors as e:
                         print('FTP error:', e)
                         logging.warning(spp + ": DDWNLOAD ERROR " + v['full_download_path'] + "\n")
 
