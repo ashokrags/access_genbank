@@ -185,7 +185,7 @@ class GenbankAccessor:
                     pass
 
                 try:
-                    self.host.dir(v['full_download_path'].replace('fna', 'fnap'), null_call())
+                    self.host.dir(v['full_download_path'], null_call())
                 except:
                     file_exists = False
 
