@@ -181,6 +181,7 @@ class GenbankAccessor:
                     self.host.cwd(v['download_path'])
 
                 file_exists = True
+
                 def null_call():
                     pass
 
@@ -192,7 +193,7 @@ class GenbankAccessor:
                 file_copy = os.path.join(down_dir,file_to_retr)
 
                 if file_exists:
-                    self.host.dir(v['full_download_path'])
+                    #self.host.dir(v['full_download_path'])
                     file_orig = os.path.join(v['download_path'], file_to_retr)
                     try:
                         with open(file_copy, 'w') as fp:
