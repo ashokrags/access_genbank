@@ -221,7 +221,7 @@ class GenbankAccessor:
             concat_gzip_file = os.path.join(down_dir,concat_file)+".gz"
             if os.path.isfile(concat_gzip_file):
                 os.remove(concat_gzip_file)
-            sp.check_output( "gzip " + os.path.join(down_dir,concat_file) , shell=True)
+            sp.check_output( "cat " + os.path.join(down_dir,concat_file) + " | gzip  > " + concat_gzip_file , shell=True)
         return
 
 def get_args():
@@ -255,7 +255,7 @@ def get_args():
 if __name__== "__main__" :
     my_args = get_args()
     print my_args
-    GenbankAccessor( base_ftp_path=my_args.base_ftp_path,
+    GenbankAccessor(base_ftp_path=my_args.base_ftp_path,
                      assembly_dir=my_args.assembly_dir,
                      file_type_to_search=my_args.file_type_to_search,
                      species_to_exclude=my_args.species_to_exclude,
