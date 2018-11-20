@@ -2,7 +2,7 @@ import ftplib
 import logging
 import os, sys, argparse as args, tqdm
 import subprocess as sp
-
+from datetime import datetime as d
 
 # https://warwick.ac.uk/fac/sci/moac/people/students/peter_cock/python/ftp/
 
@@ -59,7 +59,7 @@ class GenbankAccessor:
         #dir_list = self.get_dir_contents(self.host)
 
         dir_list = self.host.nlst()
-        logging.info("Number of Genomes to Fetch: " + str(len(dir_list)))
+        logging.info(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + "Number of Genomes to Fetch: " + str(len(dir_list)))
         return
 
     def create_species_download_list(self):
@@ -87,7 +87,7 @@ class GenbankAccessor:
             ##if species in species_to_exclude:
             ##    print "found species to exclude"
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
-            logging.info(species + ":" + species_rtrv_path)
+            logging.info(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + species + ":" + species_rtrv_path)
             #    logging.warnings(species + ": Connection timeout\n")
             try:
                 self.host.cwd(species_rtrv_path)
@@ -148,7 +148,7 @@ class GenbankAccessor:
                                                'file_to_retr': file_to_retr, 'full_download_path':full_file_path,
                                                'alt_download_path':self.host.pwd() ,'wget_command': com}
             else:
-                logging.warning(species + ": Assembly not found .. Skipping")
+                logging.warning(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + species + ": Assembly not found .. Skipping")
                 self.download_info[species] = {'Available': False}
         return
 
@@ -164,7 +164,7 @@ class GenbankAccessor:
         if not os.path.exists(down_dir):
             os.mkdir(down_dir)
 
-        concat_file = self.base_ftp_path.split("/")[-1] + "_concat.fa"
+        concat_file = self.base_ftp_path.split("/")[-1] + d.now().strftime("_%Y_%m_%d_%H_%M_") + "concat.fa"
 
         self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
 
@@ -200,22 +200,22 @@ class GenbankAccessor:
                             res = self.host.retrbinary('RETR ' + file_orig, fp.write)
                             if not res.startswith('226 Transfer complete'):
                                 print('Download failed')
-                                logging.warning(spp + ": DDWNLOAD FAILED " + v['full_download_path'] + "\n")
+                                logging.warning(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD FAILED " + v['full_download_path'] + "\n")
                                 if os.path.isfile(file_copy):
                                     os.remove(file_copy)
                             else:
-                                logging.info(spp + ": DDWNLOAD COMPLETE " + v['full_download_path'] + "\n")
+                                logging.info(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD COMPLETE " + v['full_download_path'] + "\n")
 
                     except ftplib.all_errors as e:
                         print('FTP error:', e)
-                        logging.warning(spp + ": DDWNLOAD ERROR " + v['full_download_path'] + "\n")
+                        logging.warning(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD ERROR " + v['full_download_path'] + "\n")
 
                     if self.concatenate:
                         com = "gunzip -c " + os.path.join(down_dir,file_to_retr) + " | sed 's/>/>" + spp + "_/' >> "
                         com += os.path.join(down_dir, concat_file )
                         sp.check_output(com, shell=True)
                 else:
-                    logging.warning(spp + ": FILE DOES NOT EXIST " + v['full_download_path'] + "\n" )
+                    logging.warning(d.now().strftime("%Y_%m_%d %H:%M:%S: ")+ spp + ": FILE DOES NOT EXIST " + v['full_download_path'] + "\n" )
 
         if self.concatenate and os.path.exists(os.path.join(down_dir, concat_file)):
             concat_gzip_file = os.path.join(down_dir,concat_file)+".gz"
