@@ -186,8 +186,9 @@ class GenbankAccessor:
                 def null_call():
                     pass
 
+                tmp_list=[]
                 try:
-                    self.host.dir(v['full_download_path'], null_call)
+                    self.host.dir(v['full_download_path'], tmp_list.append)
                 except:
                     file_exists = False
 
