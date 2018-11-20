@@ -104,7 +104,8 @@ class GenbankAccessor:
                 dir_list = self.host.nlst()
 
                 if len(dir_list) > 1:
-                    info_txt = species + ": There are multiple assemblies\n\tAssemblies: "
+                    info_txt = d.now().strftime("%Y_%m_%d %H:%M:%S: ")
+                    info_txt += species + ": There are multiple assemblies\n\tAssemblies: "
                     info_txt += ', '.join(dir_list)
                     info_txt += "\n\tUsing the Latest Assembly: " + dir_list[-1]
                     logging.warning(info_txt)
@@ -112,7 +113,7 @@ class GenbankAccessor:
                 else:
 
                     tmp_final_path  = os.path.join(tmp_final_path, dir_list[0])
-                    logging.info(species + ": Single Assembly: " + dir_list[0] )
+                    logging.info(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + species + ": Single Assembly: " + dir_list[0] )
 
                 # change into the assembly directory
                 # To fix timeout errors just kit the files in the directory every time
