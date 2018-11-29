@@ -94,6 +94,7 @@ class GenbankAccessor:
             except:
                 self.host.close()
                 self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
+
             dir_list = self.host.nlst()
 
             if self.assembly_dir in dir_list:
@@ -210,7 +211,7 @@ class GenbankAccessor:
 
                     except ftplib.all_errors as e:
                         print('FTP error:', e)
-                        logging.warning(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD ERROR " + v['full_download_path'] + "\n")
+                        logging.error(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD ERROR " + v['full_download_path'] + "\n")
 
                     if self.concatenate:
                         com = "gunzip -c " + os.path.join(down_dir,file_to_retr) + " | sed 's/>/>" + spp + "_/' >> "
