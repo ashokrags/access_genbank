@@ -10,9 +10,6 @@ from datetime import datetime as d
 # base_path = sys.argv[1]
 
 
-
-
-
 class GenbankAccessor:
     files_downloaded = []
     species_retrieved = []
@@ -23,6 +20,7 @@ class GenbankAccessor:
                  assembly_dir = 'latest_assembly_versions',
                  file_type_to_search='genomic.fna',
                  species_to_exclude=["Abiotrophia_sp._HMSC24B09"],
+                 target_species = [],
                  concatenate=False,
                  output_dir = None,
                  log_dir = None,
@@ -37,7 +35,7 @@ class GenbankAccessor:
         self.base_ftp_path = base_ftp_path
         self.assembly_dir = assembly_dir
         self.species_to_exclude = species_to_exclude
-        self.target_species_list = []
+        self.target_species_list = target_species
         self.out_dir = output_dir
         self.file_type_to_search = file_type_to_search
         self.concatenate = concatenate
@@ -245,13 +243,23 @@ def get_args():
 
     parser = args.ArgumentParser()
     parser.add_argument('-b', '--base_ftp_path', default = '/genomes/refseq/bacteria', help = "provide the base path for the directories to be queried")
-    parser.add_argument('-ad', '--assembly_dir', default = 'latest_assembly_versions', help = "provide the base path for the directories to be queried")
-    parser.add_argument('-ft', '--file_type_to_search', default =  'genomic.fna',  help = "provide the base path for the directories to be queried")
-    parser.add_argument('-se', '--species_to_exclude', default = [], help = "provide the base path for the directories to be queried")
-    parser.add_argument('-c', '--concatenate', default= False,  help = "provide the base path for the directories to be queried")
-    parser.add_argument('-o', '--output_dir', default = None, help = "provide the base path for the directories to be queried")
-    parser.add_argument('-ol', '--log_dir', default = None, help = "provide the base path for the directories to be queried")
-    parser.add_argument('-dr', '--dry_run', default = False, help = "provide the base path for the directories to be queried")
+    parser.add_argument('-ad', '--assembly_dir', default = 'latest_assembly_versions', help = " The Assembly directory for downloading, this path\
+                                                                                               is presumed to be a sub direcotry within the base path")
+    parser.add_argument('-ft', '--file_type_to_search', default =  'genomic.fna',  help = "File type to download, based on the suffix of the files found\
+                                                                                          in the genbank folder, default 'genomic.fna'")
+    parser.add_argument('-se', '--species_to_exclude', default = [], help = "list of species to exclude, the format for the species name\
+                                                                            should be a python list:. eg. ['spp1', 'spp2', 'spp'3].\
+                                                                             When given this list, all genomes except those in the list\
+                                                                             will be downloaded")
+    parser.add_argument('-ts', '--target_species', default=[], help="list of species to download, the format for the species name\
+                                                                                should be a python list:. eg. ['spp1', 'spp2', 'spp'3].\
+                                                                                 When given this list, only the genomes in the list\
+                                                                                 will be downloaded")
+    parser.add_argument('-c', '--concatenate', default= False,  help = "Should all the downloaded files be concatenated into one\
+                                                                        giant genoome? (Tue/False) default: False")
+    parser.add_argument('-o', '--output_dir', default = None, help = "provide the  path for the output directory")
+    parser.add_argument('-ol', '--log_dir', default = None, help = "provide the path for the logs to be stored")
+    parser.add_argument('-dr', '--dry_run', default = True, help = "do a dry run without downloading anything (True/False) default: True")
     myargs = parser.parse_args()
     return myargs
 
@@ -262,6 +270,7 @@ if __name__== "__main__" :
                      assembly_dir=my_args.assembly_dir,
                      file_type_to_search=my_args.file_type_to_search,
                      species_to_exclude=my_args.species_to_exclude,
+                     target_species = my_args.target_species,
                      concatenate=True,
                      #concatenate=my_args.concatenate,
                      output_dir=my_args.output_dir,
