@@ -4,6 +4,7 @@ import os, sys, argparse as args, tqdm
 import subprocess as sp
 from datetime import datetime as d
 
+
 # https://warwick.ac.uk/fac/sci/moac/people/students/peter_cock/python/ftp/
 
 
@@ -16,19 +17,19 @@ class GenbankAccessor:
     download_info = dict()
     assembly_dir = ''
 
-    def __init__(self, base_ftp_path = '/genomes/refseq/bacteria',
-                 assembly_dir = 'latest_assembly_versions',
+    def __init__(self, base_ftp_path='/genomes/refseq/bacteria',
+                 assembly_dir='latest_assembly_versions',
                  file_type_to_search='genomic.fna',
                  species_to_exclude=["Abiotrophia_sp._HMSC24B09"],
-                 target_species = [],
+                 target_species=[],
                  concatenate=False,
-                 output_dir = None,
-                 log_dir = None,
-                 dry_run = False):
+                 output_dir=None,
+                 log_dir=None,
+                 dry_run=False):
 
         logfile = "genbank_download_app.log"
         if log_dir is not None:
-            logfile = os.path.join(log_dir,"genbank_download_app.log")
+            logfile = os.path.join(log_dir, "genbank_download_app.log")
         logging.basicConfig(filename=logfile, filemode='w', format='%(levelname)s - %(message)s',
                             level=logging.DEBUG)
 
@@ -48,13 +49,11 @@ class GenbankAccessor:
 
         return
 
-
-
     def init_connect(self):
         self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
         self.host.cwd(self.base_ftp_path)
         ## TO REMOVE
-        #dir_list = self.get_dir_contents(self.host)
+        # dir_list = self.get_dir_contents(self.host)
 
         dir_list = self.host.nlst()
         logging.info(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + "Number of Genomes to Fetch: " + str(len(dir_list)))
@@ -76,12 +75,11 @@ class GenbankAccessor:
                 self.species_retrieved = [x for x in dir_list]
         return
 
-
     def create_download_genomes_list(self):
         print "\n\n**** Getting the list of species to download\n"
 
         for species in tqdm.tqdm(self.species_retrieved):
-            #print species
+            # print species
             ##if species in species_to_exclude:
             ##    print "found species to exclude"
             species_rtrv_path = os.path.join(self.base_ftp_path, species)
@@ -96,7 +94,7 @@ class GenbankAccessor:
             dir_list = self.host.nlst()
 
             if self.assembly_dir in dir_list:
-                #print species, self.assembly_dir
+                # print species, self.assembly_dir
                 tmp_final_path = os.path.join(species_rtrv_path, self.assembly_dir)
                 self.host.cwd(tmp_final_path)
 
@@ -108,11 +106,12 @@ class GenbankAccessor:
                     info_txt += ', '.join(dir_list)
                     info_txt += "\n\tUsing the Latest Assembly: " + dir_list[-1]
                     logging.warning(info_txt)
-                    tmp_final_path = os.path.join(tmp_final_path,dir_list[-1])
+                    tmp_final_path = os.path.join(tmp_final_path, dir_list[-1])
                 else:
 
-                    tmp_final_path  = os.path.join(tmp_final_path, dir_list[0])
-                    logging.info(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + species + ": Single Assembly: " + dir_list[0] )
+                    tmp_final_path = os.path.join(tmp_final_path, dir_list[0])
+                    logging.info(
+                        d.now().strftime("%Y_%m_%d %H:%M:%S: ") + species + ": Single Assembly: " + dir_list[0])
 
                 # change into the assembly directory
                 # To fix timeout errors just kit the files in the directory every time
@@ -121,11 +120,10 @@ class GenbankAccessor:
 
                 self.host.cwd(tmp_final_path)
 
-
                 retr_file_list = self.host.nlst()
 
-                #print " The Observed working directory is: ", tmp_final_path
-                #print " The Actual working directory is: ", self.host.pwd()
+                # print " The Observed working directory is: ", tmp_final_path
+                # print " The Actual working directory is: ", self.host.pwd()
 
                 full_file_path = ''
 
@@ -135,31 +133,31 @@ class GenbankAccessor:
                     tmp_list_files = [retr_file_list[x] for x in download_files_idx_list]
                     download_file_idx = [i for i, s in enumerate(tmp_list_files) if 'from_genomic' not in s]
                     file_to_retr = tmp_list_files[download_file_idx[0]]
-                    full_file_path = os.path.join(tmp_final_path, file_to_retr )
+                    full_file_path = os.path.join(tmp_final_path, file_to_retr)
                 else:
                     download_file_idx = [i for i, s in enumerate(retr_file_list) if self.file_type_to_search in s][0]
-                    #print self.host.listdir(".")[download_file_idx[0]]
+                    # print self.host.listdir(".")[download_file_idx[0]]
                     file_to_retr = retr_file_list[download_file_idx[0]]
-                    full_file_path = os.path.join(tmp_final_path, file_to_retr )
+                    full_file_path = os.path.join(tmp_final_path, file_to_retr)
 
                 com = "wget ftp://"
-                com +=  os.path.join(tmp_final_path, file_to_retr)
+                com += os.path.join(tmp_final_path, file_to_retr)
                 self.download_info[species] = {'Available': True, 'download_path': tmp_final_path,
-                                               'file_to_retr': file_to_retr, 'full_download_path':full_file_path,
-                                               'alt_download_path':self.host.pwd() ,'wget_command': com}
+                                               'file_to_retr': file_to_retr, 'full_download_path': full_file_path,
+                                               'alt_download_path': self.host.pwd(), 'wget_command': com}
             else:
                 logging.warning(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + species + ": Assembly not found .. Skipping")
                 self.download_info[species] = {'Available': False}
         return
 
     def download_genomes(self):
-        print "\n\n **** Download Started \n"
+        print ("\n\n **** Download Started \n")
         logging.info("************\nDownload Logs\n************\n")
 
         if self.out_dir is not None:
             down_dir = os.path.join(self.out_dir, "genbank_downloads")
         else:
-            down_dir = os.path.join(os.getcwd(),"genbank_downloads")
+            down_dir = os.path.join(os.getcwd(), "genbank_downloads")
 
         if not os.path.exists(down_dir):
             os.mkdir(down_dir)
@@ -168,7 +166,7 @@ class GenbankAccessor:
 
         self.host = ftplib.FTP('ftp.ncbi.nlm.nih.gov', 'anonymous', 'password')
 
-        for spp,v in tqdm.tqdm(self.download_info.items()):
+        for spp, v in tqdm.tqdm(self.download_info.items()):
             if not v['Available']:
                 continue
             else:
@@ -185,69 +183,78 @@ class GenbankAccessor:
                 def null_call():
                     pass
 
-                tmp_list=[]
+                tmp_list = []
                 try:
                     self.host.dir(v['full_download_path'], tmp_list.append)
                 except:
                     file_exists = False
 
-                file_copy = os.path.join(down_dir,file_to_retr)
+                file_copy = os.path.join(down_dir, file_to_retr)
 
                 if file_exists:
-                    #self.host.dir(v['full_download_path'])
+                    # self.host.dir(v['full_download_path'])
                     file_orig = os.path.join(v['download_path'], file_to_retr)
                     try:
                         with open(file_copy, 'w') as fp:
                             res = self.host.retrbinary('RETR ' + file_orig, fp.write)
                             if not res.startswith('226 Transfer complete'):
                                 print('Download failed')
-                                logging.warning(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD FAILED " + v['full_download_path'] + "\n")
+                                logging.warning(
+                                    d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD FAILED " + v[
+                                        'full_download_path'] + "\n")
                                 if os.path.isfile(file_copy):
                                     os.remove(file_copy)
                             else:
-                                logging.info(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD COMPLETE " + v['full_download_path'] + "\n")
+                                logging.info(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD COMPLETE " + v[
+                                    'full_download_path'] + "\n")
 
                     except ftplib.all_errors as e:
                         print('FTP error:', e)
-                        logging.error(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD ERROR " + v['full_download_path'] + "\n")
+                        logging.error(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": DDWNLOAD ERROR " + v[
+                            'full_download_path'] + "\n")
 
                     if self.concatenate:
-                        com = "gunzip -c " + os.path.join(down_dir,file_to_retr) + " | sed 's/>/>" + spp + "_/' >> "
-                        com += os.path.join(down_dir, concat_file )
+                        com = "gunzip -c " + os.path.join(down_dir, file_to_retr) + " | sed 's/>/>" + spp + "_/' >> "
+                        com += os.path.join(down_dir, concat_file)
                         sp.check_output(com, shell=True)
                 else:
-                    logging.warning(d.now().strftime("%Y_%m_%d %H:%M:%S: ")+ spp + ": FILE DOES NOT EXIST " + v['full_download_path'] + "\n" )
+                    logging.warning(d.now().strftime("%Y_%m_%d %H:%M:%S: ") + spp + ": FILE DOES NOT EXIST " + v[
+                        'full_download_path'] + "\n")
 
         if self.concatenate and os.path.exists(os.path.join(down_dir, concat_file)):
-            concat_gzip_file = os.path.join(down_dir,concat_file)+".gz"
+            concat_gzip_file = os.path.join(down_dir, concat_file) + ".gz"
             if os.path.isfile(concat_gzip_file):
                 os.remove(concat_gzip_file)
-            sp.check_output( "cat " + os.path.join(down_dir,concat_file) + " | gzip  > " + concat_gzip_file , shell=True)
+            sp.check_output("cat " + os.path.join(down_dir, concat_file) + " | gzip  > " + concat_gzip_file, shell=True)
         return
 
+
 def get_args():
-    '''
+    """
+    :return:
+
     Use Argparse to parse command line arguments
 
 
     :return: Argument Parser
-    '''
+    """
 
-    #base_ftp_path = '/genomes/refseq/bacteria',
-    #assembly_dir = 'latest_assembly_versions',
-    #file_type_to_search = 'genomic.fna',
-    #species_to_exclude = ["Abiotrophia_sp._HMSC24B09"],
-    #concatenate = False,
-    #output_dir = None,
-    #dry_run = False
+    # base_ftp_path = '/genomes/refseq/bacteria',
+    # assembly_dir = 'latest_assembly_versions',
+    # file_type_to_search = 'genomic.fna',
+    # species_to_exclude = ["Abiotrophia_sp._HMSC24B09"],
+    # concatenate = False,
+    # output_dir = None,
+    # dry_run = False
 
     parser = args.ArgumentParser()
-    parser.add_argument('-b', '--base_ftp_path', default = '/genomes/refseq/bacteria', help = "provide the base path for the directories to be queried")
-    parser.add_argument('-ad', '--assembly_dir', default = 'latest_assembly_versions', help = " The Assembly directory for downloading, this path\
+    parser.add_argument('-b', '--base_ftp_path', default='/genomes/refseq/bacteria',
+                        help="provide the base path for the directories to be queried")
+    parser.add_argument('-ad', '--assembly_dir', default='latest_assembly_versions', help=" The Assembly directory for downloading, this path\
                                                                                                is presumed to be a sub direcotry within the base path")
-    parser.add_argument('-ft', '--file_type_to_search', default =  'genomic.fna',  help = "File type to download, based on the suffix of the files found\
+    parser.add_argument('-ft', '--file_type_to_search', default='genomic.fna', help="File type to download, based on the suffix of the files found\
                                                                                           in the genbank folder, default 'genomic.fna'")
-    parser.add_argument('-se', '--species_to_exclude', default = [], help = "list of species to exclude, the format for the species name\
+    parser.add_argument('-se', '--species_to_exclude', default=[], help="list of species to exclude, the format for the species name\
                                                                             should be a python list:. eg. ['spp1', 'spp2', 'spp'3].\
                                                                              When given this list, all genomes except those in the list\
                                                                              will be downloaded")
@@ -255,24 +262,26 @@ def get_args():
                                                                                 should be a python list:. eg. ['spp1', 'spp2', 'spp'3].\
                                                                                  When given this list, only the genomes in the list\
                                                                                  will be downloaded")
-    parser.add_argument('-c', '--concatenate', default= False,  help = "Should all the downloaded files be concatenated into one\
-                                                                        giant genoome? (Tue/False) default: False")
-    parser.add_argument('-o', '--output_dir', default = None, help = "provide the  path for the output directory")
-    parser.add_argument('-ol', '--log_dir', default = None, help = "provide the path for the logs to be stored")
-    parser.add_argument('-dr', '--dry_run', default = True, help = "do a dry run without downloading anything (True/False) default: True")
+    parser.add_argument('-c', '--concatenate', default=False, help="Should all the downloaded files be concatenated into one\
+                                                                        giant genoome? (True/False) default: False")
+    parser.add_argument('-o', '--output_dir', default=None, help="provide the  path for the output directory")
+    parser.add_argument('-ol', '--log_dir', default=None, help="provide the path for the logs to be stored")
+    parser.add_argument('-dr', '--dry_run', default=True,
+                        help="do a dry run without downloading anything (True/False) default: True")
     myargs = parser.parse_args()
     return myargs
 
-if __name__== "__main__" :
+
+if __name__ == "__main__":
     my_args = get_args()
-    print my_args
+    print (my_args)
     GenbankAccessor(base_ftp_path=my_args.base_ftp_path,
-                     assembly_dir=my_args.assembly_dir,
-                     file_type_to_search=my_args.file_type_to_search,
-                     species_to_exclude=my_args.species_to_exclude,
-                     target_species = my_args.target_species,
-                     concatenate=True,
-                     #concatenate=my_args.concatenate,
-                     output_dir=my_args.output_dir,
-                     log_dir=my_args.log_dir,
-                     dry_run=my_args.dry_run)
+                    assembly_dir=my_args.assembly_dir,
+                    file_type_to_search=my_args.file_type_to_search,
+                    species_to_exclude=my_args.species_to_exclude,
+                    target_species=my_args.target_species,
+                    concatenate=True,
+                    # concatenate=my_args.concatenate,
+                    output_dir=my_args.output_dir,
+                    log_dir=my_args.log_dir,
+                    dry_run=my_args.dry_run)
