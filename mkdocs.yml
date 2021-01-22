@@ -29,7 +29,6 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Docs: intro.md
   - Command Options: command_description.md
   - Tutorials:
       - Download All genomes: tutorials/download_all.md
