@@ -1,6 +1,6 @@
 # Project Title
 
-[![Travis](https://img.shields.io/travis/compbiocore/cbc-documentation-templates.svg?style=flat-square)](https://travis-ci.org/compbiocore/access_genbank)
+[![Travis](https://img.shields.io/travis/compbiocore/cbc-documentation-templates.svg?style=flat-square)](https://travis-ci.com/compbiocore/access_genbank)
 [![Coverage](https://img.shields.io/coveralls/github/jekyll/jekyll.svg?style=flat-square)](http://www.coverage.com)
 [![Docs](https://img.shields.io/badge/docs-stable-blue.svg?style=flat-square)](https://compbiocore.github.io/access_genbank)
 [![License](https://img.shields.io/badge/license-GPL_3.0-orange.svg?style=flat-square)](https://raw.githubusercontent.com/compbiocore/cbc-documentation-templates/master/LICENSE.md)  
