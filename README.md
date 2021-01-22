@@ -7,7 +7,7 @@
 
 
 ## Overview
-**Access Genbank** is an user-friendly python implementation of a python script to download sequence data from. 
+**Access Genbank** is an user-friendly python implementation of a script to download sequence data from Genbank. 
 
 ## Getting Started
 
