@@ -36,6 +36,8 @@ jobs:
         run: |
           conda info
           conda list 
+          conda install python=3
+          conda install pip
           which pip
           pip install mkdocs
           pip install mkdocs-material
