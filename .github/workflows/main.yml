@@ -23,17 +23,17 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - Name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
         with:
           ref: gh-pages
       # Runs a set of commands using the runners shell
-      - Name: Setup Mkdocs
+      - name: Setup Mkdocs
         uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
           activate-environment: foo
-      - Name: Bash
+      - name: Bash
         shell: bash -l {0}
         run: |
           conda info
@@ -50,7 +50,7 @@ jobs:
           curl https://gist.githubusercontent.com/fernandogelin/08ecff3387dffc374c4abf06a577ab71/raw/29ad95fcc771ce49ff6cecc56346218a0e929df8/dark_mode.css > docs/styles/dark_mode.css
           curl https://gist.githubusercontent.com/fernandogelin/b02ee98f2f35ce4263093f7a1c66582b/raw/20ca5a37eb6defe00d35e50e7e00a784b64309f9/cbc-logo.svg > docs/assets/cbc-logo.svg
           mkdocs build -d mkdocs_build --verbose --clean --strict
-      - Name: Deploy
+      - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
          #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
