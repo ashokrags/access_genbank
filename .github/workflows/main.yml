@@ -26,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: gh-pages
+          persist-credentials: false
       # Runs a set of commands using the runners shell
       - name: Setup Mkdocs
         uses: conda-incubator/setup-miniconda@v2
@@ -36,13 +36,8 @@ jobs:
       - name: Bash
         shell: bash -l {0}
         run: |
-          conda info
-          conda list 
-          conda install python=3
-          conda install pip
-          which pip
-          pip install mkdocs
-          pip install mkdocs-material
+          conda install python=3 pip
+          pip install mkdocs mkdocs-material
           mkdocs -h
           mkdir -p docs/styles
           mkdir -p docs/assets
