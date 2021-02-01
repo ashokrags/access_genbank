@@ -1,7 +1,7 @@
 site_name: Computational Biology Core - Brown University
 site_author: Ashok Ragavendran
-repo_url: https://github.com/compbiocore/bioflows
-site_description: Documentation for running Bioinformatics/Computational workflows with bioflowa
+repo_url: https://github.com/compbiocore/access_genbank
+site_description: Documentation for downloading references from Genbank
 site_url: https://compbiocore.github.io/
 google_analytics: [ 'UA-115983496-2', 'compbiocore.github.io' ]
 
@@ -10,8 +10,8 @@ theme:
   feature:
     tabs: true
   palette:
-    primary: 'blue grey'
-    accent: 'indigo'
+    primary: 'cyan'
+    accent: 'deep orange'
   logo: assets/cbc-logo.svg
 
 extra_css:
