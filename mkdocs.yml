@@ -9,6 +9,7 @@ theme:
   name: material
   features:
     - navigation.tabs
+    - toc.integrate
   palette:
     primary: 'cyan'
     accent: 'deep orange'
