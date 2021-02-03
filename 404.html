@@ -225,7 +225,9 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="https://compbiocore.github.io/" title="Computational Biology Core - Brown University" class="md-nav__button md-logo" aria-label="Computational Biology Core - Brown University">
       
@@ -391,7 +393,7 @@
       <script>
         app = initialize({
           base: "/",
-          features: ['navigation.tabs'],
+          features: ['navigation.tabs', 'toc.integrate'],
           search: Object.assign({
             worker: "/assets/javascripts/worker/search.9c0e82ba.min.js"
           }, typeof search !== "undefined" && search)
