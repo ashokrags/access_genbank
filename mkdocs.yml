@@ -7,8 +7,9 @@ google_analytics: [ 'UA-115983496-2', 'compbiocore.github.io' ]
 
 theme:
   name: material
-  feature:
-    tabs: true
+  features:
+    - navigation.tabs
+    - toc.integrate
   palette:
     primary: 'cyan'
     accent: 'deep orange'
