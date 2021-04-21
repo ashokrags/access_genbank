@@ -6,4 +6,4 @@ authors:
 repo_url: https://github.com/compbiocore/access_genbank
 site_description: "An user-friendly python implementation of a script to download sequence data from Genbank. "
 docs_url: https://compbiocore.github.io/access_genbank/
-type: software
+type: workshop
